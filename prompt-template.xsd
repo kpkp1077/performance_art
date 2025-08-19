@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://example.com/prompt-template"
+           xmlns:pt="http://example.com/prompt-template"
+           elementFormDefault="qualified">
+
+    <!-- Root element definition -->
+    <xs:element name="promptTemplate" type="pt:PromptTemplateType"/>
+
+    <!-- Main prompt template type -->
+    <xs:complexType name="PromptTemplateType">
+        <xs:sequence>
+            <xs:element name="metadata" type="pt:MetadataType"/>
+            <xs:element name="variables" type="pt:VariablesType" minOccurs="0"/>
+            <xs:element name="systemPrompt" type="pt:PromptContentType" minOccurs="0"/>
+            <xs:element name="userPrompt" type="pt:PromptContentType"/>
+            <xs:element name="examples" type="pt:ExamplesType" minOccurs="0"/>
+            <xs:element name="constraints" type="pt:ConstraintsType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="version" type="xs:string" use="required"/>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+    </xs:complexType>
+
+    <!-- Metadata type -->
+    <xs:complexType name="MetadataType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="author" type="xs:string" minOccurs="0"/>
+            <xs:element name="created" type="xs:dateTime"/>
+            <xs:element name="lastModified" type="xs:dateTime"/>
+            <xs:element name="tags" type="pt:TagsType" minOccurs="0"/>
+            <xs:element name="category" type="pt:CategoryType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Tags type -->
+    <xs:complexType name="TagsType">
+        <xs:sequence>
+            <xs:element name="tag" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Category enumeration -->
+    <xs:simpleType name="CategoryType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="creative"/>
+            <xs:enumeration value="analytical"/>
+            <xs:enumeration value="conversational"/>
+            <xs:enumeration value="technical"/>
+            <xs:enumeration value="educational"/>
+            <xs:enumeration value="business"/>
+            <xs:enumeration value="other"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Variables type -->
+    <xs:complexType name="VariablesType">
+        <xs:sequence>
+            <xs:element name="variable" type="pt:VariableType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Variable type -->
+    <xs:complexType name="VariableType">
+        <xs:sequence>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="defaultValue" type="xs:string" minOccurs="0"/>
+            <xs:element name="validation" type="pt:ValidationType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="pt:VariableDataType" use="required"/>
+        <xs:attribute name="required" type="xs:boolean" default="false"/>
+    </xs:complexType>
+
+    <!-- Variable data type enumeration -->
+    <xs:simpleType name="VariableDataType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="string"/>
+            <xs:enumeration value="number"/>
+            <xs:enumeration value="boolean"/>
+            <xs:enumeration value="date"/>
+            <xs:enumeration value="email"/>
+            <xs:enumeration value="url"/>
+            <xs:enumeration value="text"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Validation type -->
+    <xs:complexType name="ValidationType">
+        <xs:sequence>
+            <xs:element name="pattern" type="xs:string" minOccurs="0"/>
+            <xs:element name="minLength" type="xs:int" minOccurs="0"/>
+            <xs:element name="maxLength" type="xs:int" minOccurs="0"/>
+            <xs:element name="allowedValues" type="pt:AllowedValuesType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Allowed values type -->
+    <xs:complexType name="AllowedValuesType">
+        <xs:sequence>
+            <xs:element name="value" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Prompt content type -->
+    <xs:complexType name="PromptContentType" mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="section" type="pt:SectionType"/>
+            <xs:element name="placeholder" type="pt:PlaceholderType"/>
+        </xs:choice>
+        <xs:attribute name="format" type="pt:FormatType" default="plain"/>
+    </xs:complexType>
+
+    <!-- Section type for structured prompts -->
+    <xs:complexType name="SectionType" mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="instruction" type="pt:InstructionType"/>
+            <xs:element name="placeholder" type="pt:PlaceholderType"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="priority" type="pt:PriorityType" default="normal"/>
+    </xs:complexType>
+
+    <!-- Instruction type that allows mixed content with placeholders -->
+    <xs:complexType name="InstructionType" mixed="true">
+        <xs:sequence>
+            <xs:element name="placeholder" type="pt:PlaceholderType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Placeholder type for variable substitution -->
+    <xs:complexType name="PlaceholderType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="variable" type="xs:string" use="required"/>
+                <xs:attribute name="fallback" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Format enumeration -->
+    <xs:simpleType name="FormatType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="plain"/>
+            <xs:enumeration value="markdown"/>
+            <xs:enumeration value="html"/>
+            <xs:enumeration value="json"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Priority enumeration -->
+    <xs:simpleType name="PriorityType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="low"/>
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="high"/>
+            <xs:enumeration value="critical"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Examples type -->
+    <xs:complexType name="ExamplesType">
+        <xs:sequence>
+            <xs:element name="example" type="pt:ExampleType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Example type -->
+    <xs:complexType name="ExampleType">
+        <xs:sequence>
+            <xs:element name="input" type="xs:string"/>
+            <xs:element name="expectedOutput" type="xs:string"/>
+            <xs:element name="explanation" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- Constraints type -->
+    <xs:complexType name="ConstraintsType">
+        <xs:sequence>
+            <xs:element name="constraint" type="pt:ConstraintType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Constraint type -->
+    <xs:complexType name="ConstraintType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="type" type="pt:ConstraintTypeEnum" use="required"/>
+                <xs:attribute name="severity" type="pt:SeverityType" default="warning"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Constraint type enumeration -->
+    <xs:simpleType name="ConstraintTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="length"/>
+            <xs:enumeration value="format"/>
+            <xs:enumeration value="content"/>
+            <xs:enumeration value="style"/>
+            <xs:enumeration value="language"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Severity enumeration -->
+    <xs:simpleType name="SeverityType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="info"/>
+            <xs:enumeration value="warning"/>
+            <xs:enumeration value="error"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

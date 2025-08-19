@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pt:promptTemplate xmlns:pt="http://example.com/prompt-template"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://example.com/prompt-template prompt-template.xsd"
+                   version="1.0"
+                   id="simple-chat-assistant">
+
+    <pt:metadata>
+        <pt:title>Simple Chat Assistant</pt:title>
+        <pt:description>A basic conversational AI assistant template</pt:description>
+        <pt:created>2024-01-15T10:30:00Z</pt:created>
+        <pt:lastModified>2024-01-15T10:30:00Z</pt:lastModified>
+        <pt:category>conversational</pt:category>
+    </pt:metadata>
+
+    <pt:variables>
+        <pt:variable name="userName" type="string" required="false">
+            <pt:description>The name of the user for personalization</pt:description>
+            <pt:defaultValue>User</pt:defaultValue>
+        </pt:variable>
+        
+        <pt:variable name="assistantTone" type="string" required="false">
+            <pt:description>The tone the assistant should use</pt:description>
+            <pt:defaultValue>friendly</pt:defaultValue>
+            <pt:validation>
+                <pt:allowedValues>
+                    <pt:value>formal</pt:value>
+                    <pt:value>friendly</pt:value>
+                    <pt:value>casual</pt:value>
+                    <pt:value>professional</pt:value>
+                </pt:allowedValues>
+            </pt:validation>
+        </pt:variable>
+    </pt:variables>
+
+    <pt:systemPrompt format="plain">
+        You are a helpful AI assistant. Be <pt:placeholder variable="assistantTone" fallback="friendly"/> and provide accurate, helpful responses to user questions.
+    </pt:systemPrompt>
+
+    <pt:userPrompt format="plain">
+        Hello! I'm <pt:placeholder variable="userName" fallback="a user"/> and I have a question for you.
+    </pt:userPrompt>
+
+    <pt:constraints>
+        <pt:constraint type="style" severity="info">Maintain a consistent tone throughout the conversation</pt:constraint>
+        <pt:constraint type="content" severity="warning">Provide accurate and helpful information</pt:constraint>
+    </pt:constraints>
+
+</pt:promptTemplate>
