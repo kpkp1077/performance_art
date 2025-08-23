@@ -4,13 +4,15 @@ from decimal import Decimal
 from django.db.models import Q
 from sales.models import Deal
 from .models import CompensationPlan, Commission, UserCompensationPlan
+from .pypy_optimizations import PyPyCommissionOptimizer, is_pypy
 
 
 class CommissionCalculator:
-    """Commission calculation utility using Pandas"""
+    """Commission calculation utility using Pandas with PyPy optimizations"""
     
     def __init__(self):
         self.commission_data = []
+        self.pypy_optimizer = PyPyCommissionOptimizer() if is_pypy() else None
     
     def calculate_deal_commission(self, deal, user_compensation_plan):
         """Calculate commission for a single deal"""
@@ -85,7 +87,7 @@ class CommissionCalculator:
             return deal.amount * (plan.base_rate / 100)
     
     def bulk_calculate_commissions(self, deals_queryset=None):
-        """Bulk calculate commissions using Pandas for performance"""
+        """Bulk calculate commissions using Pandas with PyPy optimizations"""
         if deals_queryset is None:
             deals_queryset = Deal.objects.filter(status='closed_won', commissions__isnull=True)
         
@@ -110,9 +112,13 @@ class CommissionCalculator:
                     'plan_id': user_plan.compensation_plan.id
                 })
         
-        if not deals_data:
+                if not deals_data:
             return []
-        
+
+        # Warm up PyPy JIT if needed
+        if self.pypy_optimizer and is_pypy():
+            self.pypy_optimizer.warm_up_jit(deals_data)
+
         df = pd.DataFrame(deals_data)
         
         # Vectorized commission calculations for simple types
