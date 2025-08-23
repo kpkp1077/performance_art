@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { ThemeProvider, createTheme } from '@material-ui/core/styles';
+import { CssBaseline, Box } from '@material-ui/core';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
@@ -97,14 +97,14 @@ function App() {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <Router>
             <Routes>
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </Router>
-        </LocalizationProvider>
+        </MuiPickersUtilsProvider>
       </ThemeProvider>
     );
   }
@@ -112,9 +112,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Router>
-          <Box sx={{ display: 'flex' }}>
+          <Box display="flex">
             <Navbar
               onMenuClick={toggleSidebar}
               user={user}
@@ -128,11 +128,11 @@ function App() {
             />
             <Box
               component="main"
-              sx={{
+              style={{
                 flexGrow: 1,
-                p: 3,
-                mt: 8,
-                ml: sidebarOpen ? `${DRAWER_WIDTH}px` : 0,
+                padding: 24,
+                marginTop: 64,
+                marginLeft: sidebarOpen ? DRAWER_WIDTH : 0,
                 transition: theme.transitions.create(['margin'], {
                   easing: theme.transitions.easing.sharp,
                   duration: theme.transitions.duration.leavingScreen,
@@ -149,7 +149,7 @@ function App() {
             </Box>
           </Box>
         </Router>
-      </LocalizationProvider>
+      </MuiPickersUtilsProvider>
     </ThemeProvider>
   );
 }

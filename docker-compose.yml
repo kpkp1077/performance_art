@@ -28,19 +28,15 @@ services:
       - SECRET_KEY=django-insecure-development-key-change-in-production
       - DATABASE_URL=postgresql://quotapath:quotapath123@db:5432/quotapath
       - REDIS_URL=redis://redis:6379
-      # PyPy optimizations
-      - PYPY_GC_MAX_DELTA=200MB
-      - PYPY_GC_MAJOR_COLLECT=1.82
-      - PYPY_GC_GROWTH=1.82
     volumes:
       - .:/app
     depends_on:
       - db
       - redis
     command: >
-      sh -c "pypy3 manage.py migrate &&
-             pypy3 manage.py collectstatic --noinput &&
-             pypy3 manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
 
   frontend:
     image: node:18-alpine
@@ -67,16 +63,12 @@ services:
       - SECRET_KEY=django-insecure-development-key-change-in-production
       - DATABASE_URL=postgresql://quotapath:quotapath123@db:5432/quotapath
       - REDIS_URL=redis://redis:6379
-      # PyPy optimizations for Celery
-      - PYPY_GC_MAX_DELTA=200MB
-      - PYPY_GC_MAJOR_COLLECT=1.82
-      - PYPY_GC_GROWTH=1.82
     volumes:
       - .:/app
     depends_on:
       - db
       - redis
-    command: pypy3 -m celery -A quotapath worker -l info
+    command: celery -A quotapath worker -l info
 
 volumes:
   postgres_data:

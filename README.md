@@ -32,10 +32,10 @@ An approximation of the QuotaPath sales commission and compensation tracking pla
 ## 🛠 Tech Stack
 
 ### Backend
-- **PyPy 3.10** - High-performance Python interpreter with JIT compilation
+- **Python 3.11** - Programming language
 - **Django 4.2** - Web framework
 - **Django REST Framework** - API development
-- **Pandas** - Data processing and analytics (PyPy-optimized)
+- **Pandas** - Data processing and analytics
 - **PostgreSQL** - Primary database
 - **Redis** - Caching and task queue
 - **Celery** - Background task processing
@@ -43,41 +43,21 @@ An approximation of the QuotaPath sales commission and compensation tracking pla
 ### Frontend
 - **React 18** - UI framework
 - **TypeScript** - Type safety
-- **Material-UI v5** - Component library
+- **@material-ui/core** - Component library
 - **Recharts** - Data visualization
 - **Axios** - HTTP client
 
 ### DevOps
-- **Docker & Docker Compose** - Containerization
+- **Docker & Docker Compose** - Development environment
+- **Google App Engine** - Production deployment
 - **Gunicorn** - WSGI server
 
 ## 📋 Prerequisites
 
 - Docker and Docker Compose
-- PyPy 3.10+ (for local development) or Python 3.11+
+- Python 3.11+ (for local development)
 - Node.js 18+ (for local development)
-
-## ⚡ PyPy Performance Optimizations
-
-This application is optimized for **PyPy**, providing significant performance improvements:
-
-### Performance Benefits
-- **2-4x faster** commission calculations
-- **Reduced memory usage** for large datasets
-- **JIT compilation** of calculation hotpaths
-- **Optimized garbage collection** for web applications
-
-### PyPy-Specific Features
-- **JIT Warm-up** - Pre-compiles frequently used calculation functions
-- **Memory Management** - Optimized GC settings for Django applications
-- **Pandas Optimizations** - Configured for better PyPy compatibility
-- **Connection Pooling** - Enhanced database connection management
-
-### Environment Variables
-The application automatically detects PyPy and applies optimizations:
-- `PYPY_GC_MAX_DELTA=200MB` - Garbage collection memory threshold
-- `PYPY_GC_MAJOR_COLLECT=1.82` - Major GC trigger ratio
-- `PYPY_GC_GROWTH=1.82` - Heap growth factor
+- Google Cloud SDK (for production deployment)
 
 ## 🚀 Quick Start
 
@@ -186,15 +166,13 @@ The platform supports multiple commission types:
 3. **Tiered** - Different rates for different deal sizes
 4. **Quota-based** - Rate changes based on quota attainment
 
-### PyPy + Pandas Integration
+### Pandas Integration
 
-Commission calculations leverage PyPy and Pandas for:
-- **JIT Compilation** - PyPy's Just-In-Time compiler accelerates calculation loops
-- **Bulk Processing** - Vectorized operations with PyPy optimizations
-- **Memory Efficiency** - PyPy's garbage collector optimized for large datasets
+Commission calculations leverage Pandas for:
+- **Bulk Processing** - Vectorized operations for performance
 - **Analytics** - Statistical analysis and aggregations
 - **Trend Analysis** - Time-series data processing
-- **Forecasting** - Predictive analytics with improved performance
+- **Forecasting** - Predictive analytics
 
 ## 🎨 UI Components
 
@@ -220,11 +198,8 @@ Commission calculations leverage PyPy and Pandas for:
 
 ## 📈 Performance Features
 
-- **PyPy JIT Compilation** - Just-in-time compilation for up to 4x performance gains
-- **PyPy Garbage Collection** - Optimized memory management for large datasets
 - **Database Query Optimization** - Connection pooling and caching
-- **Pandas Vectorization** - PyPy-optimized for commission calculations
-- **JIT Warm-up** - Pre-compilation of calculation hotpaths
+- **Pandas Vectorization** - Optimized commission calculations
 - **Caching** with Redis
 - **Background Tasks** with Celery
 - **Frontend Code Splitting**
@@ -241,18 +216,58 @@ cd frontend && npm test
 
 ## 📦 Deployment
 
-The application is containerized and can be deployed using:
+### Google App Engine (Production)
 
-- **Docker Swarm**
-- **Kubernetes**
-- **Cloud platforms** (AWS, GCP, Azure)
+The application is configured for Google App Engine Flexible Environment:
+
+1. **Install Google Cloud SDK**
+   ```bash
+   # Visit: https://cloud.google.com/sdk/docs/install
+   ```
+
+2. **Authenticate and set project**
+   ```bash
+   gcloud auth login
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+3. **Set up Cloud SQL (PostgreSQL)**
+   ```bash
+   gcloud sql instances create quotapath-db --database-version=POSTGRES_14 --region=us-central1
+   gcloud sql databases create quotapath --instance=quotapath-db
+   ```
+
+4. **Set up Memorystore (Redis)**
+   ```bash
+   gcloud redis instances create quotapath-redis --size=1 --region=us-central1
+   ```
+
+5. **Deploy the application**
+   ```bash
+   ./deploy.sh
+   ```
 
 ### Environment Variables
 
+#### Development
 - `DEBUG` - Django debug mode
 - `SECRET_KEY` - Django secret key
 - `DATABASE_URL` - Database connection string
 - `REDIS_URL` - Redis connection string
+
+#### Production (Google App Engine)
+- `DB_NAME` - Cloud SQL database name
+- `DB_USER` - Cloud SQL username
+- `DB_PASSWORD` - Cloud SQL password
+- `DB_HOST` - Cloud SQL instance IP
+- `REDIS_URL` - Memorystore Redis URL
+
+### Alternative Deployment Options
+
+The application can also be deployed using:
+- **Docker containers** on any cloud platform
+- **Kubernetes** with the provided Docker configuration
+- **Traditional VPS** hosting
 
 ## 🤝 Contributing
 
