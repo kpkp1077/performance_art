@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: quotapath
+      POSTGRES_USER: quotapath
+      POSTGRES_PASSWORD: quotapath123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-development-key-change-in-production
+      - DATABASE_URL=postgresql://quotapath:quotapath123@db:5432/quotapath
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm install &&
+             npm start"
+    depends_on:
+      - backend
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-development-key-change-in-production
+      - DATABASE_URL=postgresql://quotapath:quotapath123@db:5432/quotapath
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    command: celery -A quotapath worker -l info
+
+volumes:
+  postgres_data:
